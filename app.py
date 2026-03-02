@@ -67,8 +67,8 @@ def run_backtest(strategy):
     win_rate = ""
     
     if strategy == 'kd':
-        buy_t = int(request.form.get('kd_buy', 20))
-        sell_t = int(request.form.get('kd_sell', 80))
+        buy_t = int(request.form.get('kd_buy') or 20)
+        sell_t = int(request.form.get('kd_sell') or 80)
         # Need to calculate KD first from stored RSV
         kd_data = calculate_kd(data['rsv'], data['dates'], data['kpj'])
         # Trim KD data like original
@@ -77,8 +77,8 @@ def run_backtest(strategy):
         result_df, win_rate = backtest_kd(kd_data, buy_t, sell_t)
         
     elif strategy == 'william':
-        buy_t = int(request.form.get('wil_buy', -80))
-        sell_t = int(request.form.get('wil_sell', -20))
+        buy_t = int(request.form.get('wil_buy') or -80)
+        sell_t = int(request.form.get('wil_sell') or -20)
         result_df, win_rate = backtest_william(data['wil'], buy_t, sell_t)
         
     elif strategy.startswith('ma_'):
