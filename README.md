@@ -1,5 +1,67 @@
-# stock_analysis
-stock_analysis is my side project that help user choose which stock to buy.
-Here is the demo of my project:
-https://drive.google.com/file/d/1S_g86s1PDAtQwnQGJVtoNwtl2oKhOLkX/view?usp=sharing
-https://youtu.be/YDr1-a8cxL0
+# 📈 Stock Analysis (Historical Version: 2021-2023)
+
+這是一個保留了開發者學習 Python 初期「原汁原味」風格的股票分析工具。
+
+> [!NOTE]
+> 這個專案目前作為開發者心路歷程的展示。代碼中保留了許多初學者常見的模式（如：大量使用 List 手動解析、自定義的字串分割邏輯等），旨在說明當時的想法與開發程度。
+
+---
+
+## 📅 專案演進史
+
+- **2021年12月**：第一次接觸 Python。根據投資書籍中的策略（KD、威廉指標、MA均線）編寫了最初的腳本 `original(no_frontend).py`。當時的主要挑戰是爬取台灣證券交易所（TWSE）的數據並手動計算各項指標。
+- **2023年4月**：為了提升使用便利性，為專案加上了 Flask 前端介面（即目前的 `app.py`），並且修復bug，但維持在一個早期的風格頁面，也不保證正確。
+- 2026年2月：對整份code進行必要的修復處理當時沒看到的小錯，並且即將把這個介面做得更完整（在 2026-03-ver中實現）
+---
+
+## 🛠️ 技術棧與特色
+
+- **核心語言**：Python 3
+- **前端框架**：Flask
+- **數據處理**：Pandas, CSV
+- **爬蟲工具**：Requests, urllib3
+- **策略回測**：
+  - **KD 指標**：可自定義買入/賣出門檻。
+  - **威廉指標 (William %R)**：支援 14 日與 28 日參數。
+  - **MA 均線策略**：收錄了 4 種經典的均線交叉與排列策略。
+
+---
+
+## 🚀 如何運行
+
+1. **安裝依賴**：
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **啟動 Flask 應用**：
+   ```bash
+   python app.py
+   ```
+
+3. **訪問網站**：
+   在瀏覽器中開啟 `http://127.0.0.1:5000`。
+
+---
+
+## 📁 檔案說明
+
+- `app.py`: 2023 年開發的 Flask 網頁版主程式。
+- `original(no_frontend).py`: 2021 年最初開發的腳本版（純命令行介面）。
+- `stocklist.csv`: 台灣上市櫃股票清單數據（用於名稱查詢）。
+- `templates/`: 存放 HTML 模板。
+- `static/`: 存放 CSS 樣式表。
+
+---
+
+##  各式各樣實務限制
+1. 每次股票輸入區間範圍之後只能夠選擇一次策略按鈕 之後要再重新輸入一次區間範圍和股票
+2. 下載檔案時前端不會顯示正在下載而是啥都不動 
+3. 完全沒有error handling機制
+
+## ⚠️ 聲明
+此專案僅供開發歷史記錄與程式學習參考。爬蟲行為請遵守 TWSE 相關規定（代碼中已包含 `time.sleep` 以降低請求頻率）。投資有風險，回測結果不代表未來收益。
+
+---
+
+> _"Keep moving forward, but never forget where you started."_

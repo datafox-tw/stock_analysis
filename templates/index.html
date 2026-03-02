@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Stock Data Analysis</title>
-    <link href="../static/styles.css" rel="stylesheet" type="text/css">
+    <link href="/static/styles.css" rel="stylesheet" type="text/css">
 </head>
+
 <body>
     <form method="POST" action="/">
         <label for="stockNo">Stock Number:</label>
@@ -39,7 +41,7 @@
                 <input id="kd_sell" name="kd_sell" type="text" required>
                 <br>
                 <label for="rsv_data">1. KD指標</label>
-                <input id="wil_data" name="rsv_data" type="hidden" value="{{ rsv_data }}">
+                <input id="rsv_data_hidden" name="rsv_data" type="hidden" value="{{ rsv_data }}">
                 <input name="datte" type="hidden" value="{{ datte }}">
                 <input name="kpj" type="hidden" value="{{ kpj }}">
                 <button class="btn btn-danger" type="submit" value="record">KD指標</button>
@@ -102,9 +104,11 @@
     {% endif %}
     <div class="col text-end">
         <form action="/discard" method="post">
-            <input name="refresh" type="hidden" value="true"> <button class="btn btn-secondary" type="submit" value="Detect">捨棄/重新整理</button>
+            <input name="refresh" type="hidden" value="true"> <button class="btn btn-secondary" type="submit"
+                value="Detect">捨棄/重新整理</button>
         </form>
     </div>
 
 </body>
+
 </html>

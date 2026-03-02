@@ -13,7 +13,8 @@ pd.set_option('display.unicode.ambiguous_as_wide', True)
 pd.set_option('display.unicode.east_asian_width', True)
 pd.set_option('display.width', 500)
 
-app = Flask(__name__, '/static')
+app = Flask(__name__)
+
 """import model, download stock list"""
 
 table_settings = {
@@ -29,8 +30,9 @@ def extract_numbers_from_csv(file_path):
         for row in csv_reader:
             for cell in row:
                 try:
-                    if int(cell)>999:
-                        numbers.append(int(cell))
+                    num = int(cell.strip())
+                    if num > 0:
+                        numbers.append(num)
                         lastnum=True
                 except:
                     if lastnum:
@@ -76,10 +78,13 @@ def RSV(spj,zgj,zdj, position):
 # 這是做出單日KD的function
 def KD_turn(rsv,datte,kpj):  
     kd9=[]
-    rsv = rsv.strip('][').split(', ')
-    print(rsv)
-    print(type(rsv))
-    print(rsv[0])
+    rsv = [x.strip() for x in rsv.strip('][').split(', ') if x.strip()]
+    datte = [x.strip().replace("'", "") for x in datte.strip('][').split(', ') if x.strip()]
+    kpj = [x.strip() for x in kpj.strip('][').split(', ') if x.strip()]
+    
+    if not rsv:
+        return []
+        
     kd9.append([round(float(50*2/3+float(rsv[0])/3),2),round(float(50*2/3+50/3),2)])
     k1=kd9[0][0]; d1=kd9[0][1]
     for i in range(1,len(rsv)):
@@ -92,7 +97,7 @@ def KD_turn(rsv,datte,kpj):
 # 這是KD的回測function，會輸出對應的報酬資料和勝率
 def backtestkd(kdd,kl,kh):  
     record=[[0]]; mt=[]; mp=[]; st=[]; sp=[]; rr=[]; w=0; l=0
-    for i in range(1,len(kdd)):
+    for i in range(1,len(kdd)-1):
         if record[-1][0] != 'buy':
             if (kdd[i-1][0]>=kl) and (kdd[i][0]<kl):
                 record.append(['buy',kdd[i+1][2],kdd[i+1][3]])
@@ -142,7 +147,7 @@ def william28(spj,zgj,zdj,position):
  # 威廉的回測function
 def backtestwil(wil,wl,wh): 
     record=[[0]]; mt=[]; mp=[]; st=[]; sp=[]; rr=[]; w=0; l=0
-    for i in range(1,len(wil)):
+    for i in range(1,len(wil)-1):
         if record[-1][0] != 'buy':
             if (wil[i-1][0]<=wl) and (wil[i][0]>wl):
                 record.append(['buy',wil[i][2],wil[i][4]])
@@ -187,7 +192,7 @@ def ma(spj, position):
 def backtestma(ma,wk):  
     record=[[0]]; mt=[]; mp=[]; st=[]; sp=[]; rr=[]; w=0; l=0
     if wk=='A': #10ma and 20ma上揚且黃金交叉 死亡交叉賣
-        for i in range(1,len(ma)):
+        for i in range(1,len(ma)-1):
             if record[-1][0] != 'buy':
                 if (ma[i-1][1]<=ma[i][1]) and (ma[i-1][2]<=ma[i][2]) and (ma[i-1][1]<=ma[i-1][2]) and (ma[i][1]>ma[i][2]):
                     record.append(['buy',ma[i][4],ma[i][5]]) 
@@ -195,7 +200,7 @@ def backtestma(ma,wk):
                 if (ma[i-1][2]<=ma[i][2]) and (ma[i-1][1]>=ma[i-1][2]) and (ma[i][1]<ma[i][2]):
                     record.append(['sell',ma[i][4],ma[i][5]])
     elif wk=='B': # 5ma and 10ma上揚且黃金交叉買 死亡交叉賣
-        for i in range(1,len(ma)):
+        for i in range(1,len(ma)-1):
             if record[-1][0] != 'buy':
                 if (ma[i-1][0]<=ma[i][0]) and (ma[i-1][1]<=ma[i][1]) and (ma[i-1][0]<=ma[i-1][1]) and (ma[i][0]>ma[i][1]):
                     record.append(['buy',ma[i][4],ma[i][5]]) 
@@ -203,7 +208,7 @@ def backtestma(ma,wk):
                 if (ma[i-1][1]<=ma[i][1]) and (ma[i-1][0]>=ma[i-1][1]) and (ma[i][0]<ma[i][1]):
                     record.append(['sell',ma[i][4],ma[i][5]])
     elif wk=='C': #均線多頭排列買 5日線跌破10日且其餘均線仍上揚時賣
-        for i in range(1,len(ma)):
+        for i in range(1,len(ma)-1):
             if record[-1][0] != 'buy':
                 if (ma[i-1][0]<=ma[i][0]) and (ma[i-1][1]<=ma[i][1]) and (ma[i-1][2]<=ma[i-1][2]) and (ma[i][3]<=ma[i][3]) and (ma[i][0]>ma[i][1]>ma[i][2]>ma[i][3]):
                     record.append(['buy',ma[i][4],ma[i][5]]) 
@@ -211,7 +216,7 @@ def backtestma(ma,wk):
                 if (ma[i-1][0]<ma[i][1]) and (ma[i-1][1]<=ma[i][1]) and (ma[i-1][2]<=ma[i-1][2]) and (ma[i][3]<=ma[i][3]) and (ma[i][0]>ma[i][1]>ma[i][2]>ma[i][3]):
                     record.append(['sell',ma[i][4],ma[i][5]])
     elif wk=='D': #格蘭必40MA 股價突破且均線上揚時買 均線下跌且股價跌破時賣
-        for i in range(1,len(ma)):
+        for i in range(1,len(ma)-1):
             if record[-1][0] != 'buy':
                 if (ma[i-1][3]<ma[i][3]) and (ma[i][3]<ma[i][5]) and (ma[i-1][3]>=ma[i-1][5]):
                     record.append(['buy',ma[i][4],ma[i][5]]) 
@@ -249,6 +254,7 @@ def stock_crawler(stockNo, dates):
         data.columns = data.columns.droplevel(0)
         data.to_csv(file_name, index=False)
         time.sleep(random.uniform(2, 5))
+    print("SUCCESS")
 
 def csv_preprocessing(dates,stockNo):
     # 這邊把爬到的資料從儲存地點依序取出(由新到舊)，弄出一個只有收盤價的list，順序是從目前日期逆序回到目標當月1號
@@ -261,7 +267,10 @@ def csv_preprocessing(dates,stockNo):
     datte=[]
     #這個迴圈會讀取CSV檔案中每一行資料，然後我們取出需要的素材
     for dat in dates:
-        with open(str(os.getcwd())+'\\'+str(stockNo)+'_'+str(dat)+'.csv', newline='',encoding="utf-8",) as csvfile:
+        file_name = f"{stockNo}_{dat}.csv"
+        if not os.path.exists(file_name):
+            continue
+        with open(file_name, newline='', encoding="utf-8") as csvfile:
             rows = csv.DictReader(csvfile)
             m=[]
             for row in (rows):
@@ -302,13 +311,14 @@ def csv_preprocessing(dates,stockNo):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
+        print("POSTING")
         stockNo = request.form['stockNo']
         endDate = request.form['endDate']
         startDate = request.form['startDate']
         dates = hmy(endDate,startDate)
         stock_crawler(stockNo, dates)
         spj,zgj,zdj,kpj,datte,rsv_data, wil_data, ma_data = csv_preprocessing(dates,stockNo)
-        analysisname = stockname[int(stockNo)]
+        analysisname = stockname.get(int(stockNo), stockNo)
         return render_template('index.html', kpj=kpj, datte=datte, rsv_data=rsv_data,wil_data=wil_data, ma_data = ma_data, stockNo=stockNo, endDate=endDate, startDate=startDate,analysisname=analysisname)
     refresh = request.args.get('refresh')
     if refresh == 'true':
@@ -320,42 +330,78 @@ def KD():
     rsv_data = request.form['rsv_data']
     datte = request.form['datte']
     kpj = request.form['kpj']
+    if not rsv_data or rsv_data == '[]':
+         return render_template('index.html', result=('No data available', 'Please try a wider date range'))
     kd_buy = int(request.form['kd_buy'])
     kd_sell = int(request.form['kd_sell'])
     kdstock=KD_turn(rsv_data,datte,kpj)  
+    if not kdstock:
+        return render_template('index.html', result=('No data available', 'Please try a wider date range'))
     del kdstock[:21]
     result = backtestkd(kdstock,kd_buy,kd_sell)
     return render_template('index.html',result=result)
 
 @app.route('/william', methods=['POST'])
 def william():
-    wil_data = request.form['wil_data']
-    wil_buy = int(request.form['wil_buy'])
-    wil_sell = int(request.form['wil_sell'])
-    result = backtestwil(wil_data,wil_buy,wil_sell)
+    wil_raw = request.form['wil_data'].strip()
+    if not wil_raw or wil_raw == '[]':
+        return render_template('index.html', result=('No data available', 'Please try a wider date range'))
+        
+    wil_data = wil_raw.replace("[[", "").replace("]]", "").split("], [")
+    wil_parsed = []
+    for item in wil_data:
+        parts = [x.strip() for x in item.split(", ") if x.strip()]
+        if len(parts) >= 5:
+            try:
+                wil_parsed.append([float(parts[0]), float(parts[1]), parts[2].replace("'", ""), float(parts[3]), float(parts[4])])
+            except ValueError:
+                continue
+    
+    if not wil_parsed:
+        return render_template('index.html', result=('No valid data found', 'Please try again'))
+        
+    wil_buy = int(request.form['kd_buy']) if 'kd_buy' in request.form else int(request.form['wil_buy'])
+    wil_sell = int(request.form['kd_sell']) if 'kd_sell' in request.form else int(request.form['wil_sell'])
+    result = backtestwil(wil_parsed,wil_buy,wil_sell)
     return render_template('index.html',result=result)
+
+def parse_ma_data(ma_str):
+    ma_str = ma_str.strip()
+    if not ma_str or ma_str == '[]':
+        return []
+    ma_data = ma_str.replace("[[", "").replace("]]", "").split("], [")
+    ma_parsed = []
+    for item in ma_data:
+        parts = [x.strip() for x in item.split(", ") if x.strip()]
+        if len(parts) >= 6:
+            try:
+                # [5ma, 10ma, 20ma, 40ma, 'date', spj]
+                ma_parsed.append([float(parts[0]), float(parts[1]), float(parts[2]), float(parts[3]), parts[4].replace("'", ""), float(parts[5])])
+            except ValueError:
+                continue
+    return ma_parsed
 
 @app.route('/MA_A', methods=['POST'])
 def MA_A():
-    ma_data = request.form['ma_data']
+    ma_data = parse_ma_data(request.form['ma_data'])
     result = backtestma(ma_data,"A")
     return render_template('index.html',result=result)
 
 @app.route('/MA_B', methods=['POST'])
 def MA_B():
-    ma_data = request.form['ma_data']
+    ma_data = parse_ma_data(request.form['ma_data'])
     result = backtestma(ma_data,"B")
     return render_template('index.html',result=result)
 
 @app.route('/MA_C', methods=['POST'])
 def MA_C():
-    ma_data = request.form['ma_data']
+    ma_data = parse_ma_data(request.form['ma_data'])
     result = backtestma(ma_data,"C")
     return render_template('index.html',result=result)
 
 @app.route('/MA_D', methods=['POST'])
 def MA_D():
-    ma_data = request.form['ma_data']
+    ma_data = parse_ma_data(request.form['ma_data'])
     result = backtestma(ma_data,"D")
     return render_template('index.html',result=result)
 

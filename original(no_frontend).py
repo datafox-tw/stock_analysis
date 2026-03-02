@@ -61,8 +61,11 @@ zgj=[]
 zdj=[]
 kpj=[]
 datte=[]
-for dat in dates:  #這個迴圈會讀取CSV檔案中每一行資料，然後我們取出需要的素材
-    with open(str(os.getcwd())+'\\'+str(stockNo)+'_'+str(dat)+'.csv', newline='',encoding="utf-8",) as csvfile:
+for dat in dates:  # 這個迴圈會讀取CSV檔案中每一行資料，然後我們取出需要的素材
+    file_name = f"{stockNo}_{dat}.csv"
+    if not os.path.exists(file_name):
+        continue
+    with open(file_name, newline='', encoding="utf-8") as csvfile:
         rows = csv.DictReader(csvfile)
         m=[]
         for row in (rows):
