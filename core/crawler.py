@@ -39,9 +39,9 @@ def download_stock_data(stock_no, dates):
     headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'}
     for date in dates:
         url = URL_TEMPLATE.format(date, stock_no)
-        file_name = f"{stock_no}_{date}.csv"
-        if os.path.exists(file_name):
-            print(f"Skipping {file_name}, already exists.")
+        file_path = f"stock_data/{stock_no}_{date}.csv"
+        if os.path.exists(file_path):
+            print(f"Skipping {file_path}, already exists.")
             continue
             
         try:
@@ -52,7 +52,7 @@ def download_stock_data(stock_no, dates):
                 if dfs:
                     data = dfs[0]
                     data.columns = data.columns.droplevel(0)
-                    data.to_csv(file_name, index=False)
+                    data.to_csv(file_path, index=False)
         except Exception as e:
             print(f"Error downloading {file_name}: {e}")
         

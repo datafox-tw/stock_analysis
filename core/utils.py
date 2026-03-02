@@ -34,11 +34,11 @@ def process_downloaded_data(dates, stock_no):
     spj, zgj, zdj, kpj, datte = [], [], [], [], []
     
     for date in dates:
-        file_name = f"{stock_no}_{date}.csv"
-        if not os.path.exists(file_name):
+        file_path = f"stock_data/{stock_no}_{date}.csv"
+        if not os.path.exists(file_path):
             continue
             
-        with open(file_name, newline='', encoding="utf-8") as f:
+        with open(file_path, newline='', encoding="utf-8") as f:
             rows = list(csv.DictReader(f))
             # Keep original reversed logic
             for row in reversed(rows):

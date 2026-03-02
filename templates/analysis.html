@@ -19,9 +19,11 @@
             <div class="card p-3">
                 <h4 class="fw-bold mb-3">策略選擇</h4>
                 <div class="list-group list-group-flush">
-                    <button class="list-group-item list-group-item-action {% if active_tab == 'kd' %}active{% endif %}"
-                        data-bs-toggle="collapse" data-bs-target="#kd_fields">
-                        <span class="fw-bold text-danger">1. KD 指標策略</span>
+                    <div class="list-group-item">
+                        <button class="btn btn-link p-0 fw-bold text-danger text-decoration-none w-100 text-start"
+                            type="button" data-bs-toggle="collapse" data-bs-target="#kd_fields">
+                            1. KD 指標策略
+                        </button>
                         <div class="collapse mt-2 {% if active_tab == 'kd' %}show{% endif %}" id="kd_fields">
                             <form action="/backtest/kd" method="POST">
                                 <div class="row g-2">
@@ -34,12 +36,13 @@
                                 </div>
                             </form>
                         </div>
-                    </button>
+                    </div>
 
-                    <button
-                        class="list-group-item list-group-item-action {% if active_tab == 'william' %}active{% endif %}"
-                        data-bs-toggle="collapse" data-bs-target="#wil_fields">
-                        <span class="fw-bold text-info">2. William 指標策略</span>
+                    <div class="list-group-item">
+                        <button class="btn btn-link p-0 fw-bold text-info text-decoration-none w-100 text-start"
+                            type="button" data-bs-toggle="collapse" data-bs-target="#wil_fields">
+                            2. William 指標策略
+                        </button>
                         <div class="collapse mt-2 {% if active_tab == 'william' %}show{% endif %}" id="wil_fields">
                             <form action="/backtest/william" method="POST">
                                 <div class="row g-2">
@@ -54,7 +57,7 @@
                                 </div>
                             </form>
                         </div>
-                    </button>
+                    </div>
 
                     <div class="list-group-item">
                         <span class="fw-bold text-success">3. MA 均線策略</span>

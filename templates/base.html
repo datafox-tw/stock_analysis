@@ -49,10 +49,37 @@
             color: #6c757d;
             font-size: 0.9rem;
         }
+
+        /* Loading Overlay */
+        #loadingOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 9999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            color: #1e3c72;
+        }
     </style>
 </head>
 
 <body>
+    <div id="loadingOverlay">
+        <div class="spinner-border mb-3" role="status"></div>
+        <h4 class="fw-bold text-dark">正在從證交所抓取資料...</h4>
+        <p class="text-muted">這可能需要幾秒到一分鐘，請稍候。</p>
+        <div id="downloadStatus" class="fw-bold text-primary"></div>
+    </div>
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">

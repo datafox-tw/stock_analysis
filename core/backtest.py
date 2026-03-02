@@ -101,13 +101,14 @@ def backtest_ma(ma_data, strategy_type):
                 if (m_prev[1] <= m[1]) and (m_prev[0] >= m_prev[1]) and (m[0] < m[1]):
                     record.append(['sell', date, price])
                     trade_state = 'sell'
-        elif strategy_type == 'C': # Bullish alignment
+        elif strategy_type == 'C': # Bullish alignment (5>10>20>40 and rising)
             if trade_state != 'buy':
                 if (m_prev[0] <= m[0]) and (m_prev[1] <= m[1]) and (m_prev[2] <= m[2]) and (m_prev[3] <= m[3]) and (m[0] > m[1] > m[2] > m[3]):
                     record.append(['buy', date, price])
                     trade_state = 'buy'
             else:
-                if (m_prev[0] < m[1]) and (m_prev[1] <= m[1]) and (m_prev[2] <= m[2]) and (m_prev[3] <= m[3]) and (m[0] > m[1] > m[2] > m[3]):
+                # Sell when 5MA falls below 10MA
+                if (m_prev[0] >= m_prev[1]) and (m[0] < m[1]):
                     record.append(['sell', date, price])
                     trade_state = 'sell'
         elif strategy_type == 'D': # Granville 40MA
