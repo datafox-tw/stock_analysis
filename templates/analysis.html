@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Stock Info Header -->
+        <div class="col-12 mb-4">
+            <div class="card bg-white p-3 d-flex flex-row justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-0 fw-bold">{{ stock_info.name }} ({{ stock_info.no }})</h2>
+                    <p class="text-muted mb-0">分析時間範圍: {{ stock_info.start }} ~ {{ stock_info.end }}</p>
+                </div>
+                <a href="/" class="btn btn-outline-secondary">重新查詢</a>
+            </div>
+        </div>
+
+        <!-- Strategy Tabs -->
+        <div class="col-md-4 mb-4">
+            <div class="card p-3">
+                <h4 class="fw-bold mb-3">策略選擇</h4>
+                <div class="list-group list-group-flush">
+                    <button class="list-group-item list-group-item-action {% if active_tab == 'kd' %}active{% endif %}"
+                        data-bs-toggle="collapse" data-bs-target="#kd_fields">
+                        <span class="fw-bold text-danger">1. KD 指標策略</span>
+                        <div class="collapse mt-2 {% if active_tab == 'kd' %}show{% endif %}" id="kd_fields">
+                            <form action="/backtest/kd" method="POST">
+                                <div class="row g-2">
+                                    <div class="col-6"><input type="number" name="kd_buy"
+                                            class="form-control form-control-sm" placeholder="買進(20)"></div>
+                                    <div class="col-6"><input type="number" name="kd_sell"
+                                            class="form-control form-control-sm" placeholder="賣出(80)"></div>
+                                    <div class="col-12 mt-2"><button type="submit"
+                                            class="btn btn-sm btn-danger w-100">執行回測</button></div>
+                                </div>
+                            </form>
+                        </div>
+                    </button>
+
+                    <button
+                        class="list-group-item list-group-item-action {% if active_tab == 'william' %}active{% endif %}"
+                        data-bs-toggle="collapse" data-bs-target="#wil_fields">
+                        <span class="fw-bold text-info">2. William 指標策略</span>
+                        <div class="collapse mt-2 {% if active_tab == 'william' %}show{% endif %}" id="wil_fields">
+                            <form action="/backtest/william" method="POST">
+                                <div class="row g-2">
+                                    <div class="col-6"><input type="number" name="wil_buy"
+                                            class="form-control form-control-sm" placeholder="買進(-80)"></div>
+                                    <div class="col-6"><input type="number" name="wil_sell"
+                                            class="form-control form-control-sm" placeholder="賣出(-20)"></div>
+                                    <div class="col-12 mt-2"><button type="submit"
+                                            class="btn btn-sm btn-info w-100 text-white">執行回測</button></div>
+                                </div>
+                            </form>
+                        </div>
+                    </button>
+
+                    <div class="list-group-item">
+                        <span class="fw-bold text-success">3. MA 均線策略</span>
+                        <div class="d-grid gap-2 mt-2">
+                            <form action="/backtest/ma_a" method="POST"><button type="submit"
+                                    class="btn btn-sm btn-outline-success w-100 mb-1">策略 A: 10/20 黃金交叉</button></form>
+                            <form action="/backtest/ma_b" method="POST"><button type="submit"
+                                    class="btn btn-sm btn-outline-success w-100 mb-1">策略 B: 5/10 黃金交叉</button></form>
+                            <form action="/backtest/ma_c" method="POST"><button type="submit"
+                                    class="btn btn-sm btn-outline-success w-100 mb-1">策略 C: 多頭排列</button></form>
+                            <form action="/backtest/ma_d" method="POST"><button type="submit"
+                                    class="btn btn-sm btn-outline-success w-100 mb-1">策略 D: 葛蘭必 40MA</button></form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Backtest Results Display -->
+        <div class="col-md-8">
+            <div class="card p-4" style="min-height: 400px;">
+                <h4 class="fw-bold mb-4">回測報告</h4>
+
+                {% if win_rate %}
+                <div class="alert alert-primary py-2 px-3 mb-4 d-inline-block">
+                    <h5 class="mb-0 fw-bold">{{ win_rate }}</h5>
+                </div>
+                {% endif %}
+
+                {% if results %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>買進時間</th>
+                                <th>買進價格</th>
+                                <th>賣出時間</th>
+                                <th>賣出價格</th>
+                                <th class="text-end">報酬率</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in results %}
+                            <tr>
+                                <td>{{ r['買進時間'] }}</td>
+                                <td><span class="badge bg-light text-dark">{{ r['買進價格'] }}</span></td>
+                                <td>{{ r['賣出時間'] }}</td>
+                                <td><span class="badge bg-light text-dark">{{ r['賣出價格'] }}</span></td>
+                                <td
+                                    class="text-end fw-bold {% if '-' in r['報酬率'] %}text-danger{% else %}text-success{% endif %}">
+                                    {{ r['報酬率'] }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <p class="mb-0">尚未有回測結果，請從左側選擇一個策略並點擊執行。</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

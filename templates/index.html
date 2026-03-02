@@ -1,114 +1,48 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
-    <title>Stock Data Analysis</title>
-    <link href="/static/styles.css" rel="stylesheet" type="text/css">
-</head>
+{% block content %}
+<div class="hero-section text-center">
+    <div class="container">
+        <h1 class="display-4 fw-bold">股票策略回測系統</h1>
+        <p class="lead">保留三年前的核心邏輯，用更現代的形式呈現數據之美。</p>
+    </div>
+</div>
 
-<body>
-    <form method="POST" action="/">
-        <label for="stockNo">Stock Number:</label>
-        <input type="text" id="stockNo" name="stockNo" required><br><br>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card p-4">
+                <h3 class="card-title text-center mb-4">查詢股票數據</h3>
+                <form action="/" method="POST">
+                    <div class="mb-3">
+                        <label for="stockNo" class="form-label">股票代號</label>
+                        <input type="text" class="form-control" id="stockNo" name="stockNo" placeholder="例如: 2330"
+                            required>
+                        <div class="form-text">系統將從台灣證券交易所自動抓取資料。</div>
+                    </div>
 
-        <label for="endDate">End Date (YYYYMMDD):</label>
-        <input type="text" id="endDate" name="endDate" required><br><br>
+                    <div class="row mb-4">
+                        <div class="col">
+                            <label for="startDate" class="form-label">開始日期 (YYYYMMDD)</label>
+                            <input type="text" class="form-control" id="startDate" name="startDate"
+                                placeholder="20220101" required>
+                        </div>
+                        <div class="col">
+                            <label for="endDate" class="form-label">結束日期 (YYYYMMDD)</label>
+                            <input type="text" class="form-control" id="endDate" name="endDate" placeholder="20220601"
+                                required>
+                        </div>
+                    </div>
 
-        <label for="startDate">Start Date (YYYYMMDD):</label>
-        <input type="text" id="startDate" name="startDate" required><br><br>
-
-        <button class="btn btn-primary" type="submit" value="Detect">ASK!</button>
-    </form>
-    <p><br></p>
-
-    <div class="card w-100 p-3" style="width: 18rem;">
-        <div class="card-body">
-            <h4 class="card-title">你所詢問的股票名稱: {{ analysisname }}</h4>
-            <h4 class="card-title">你所詢問的股票代碼: {{ stockNo }}</h4>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">開始抓取與分析</button>
+                    </div>
+                </form>
+                {% if error %}
+                <div class="alert alert-danger mt-3">{{ error }}</div>
+                {% endif %}
+            </div>
         </div>
     </div>
-    <p><br></p>
-
-    {% if stockNo or result %}
-    <div class="row mt-4">
-
-        <div class="col text-center">
-            <form action="/KD" method="post">
-                <label for="kd_buy">kd_buy(0-100)</label>
-                <input id="kd_buy" name="kd_buy" type="text" required>
-                <br>
-                <label for="kd_sell">kd_sell(0-100)</label>
-                <input id="kd_sell" name="kd_sell" type="text" required>
-                <br>
-                <label for="rsv_data">1. KD指標</label>
-                <input id="rsv_data_hidden" name="rsv_data" type="hidden" value="{{ rsv_data }}">
-                <input name="datte" type="hidden" value="{{ datte }}">
-                <input name="kpj" type="hidden" value="{{ kpj }}">
-                <button class="btn btn-danger" type="submit" value="record">KD指標</button>
-            </form>
-        </div>
-        <br>
-        <div class="col text-center">
-            <form action="/william" method="post">
-                <label for="wil_buy">William_buy(-100 - 0)</label>
-                <input id="wil_buy" name="wil_buy" type="text" required>
-                <br>
-                <label for="wil_sell">William_sell(-100 - 0)</label>
-                <input id="wil_sell" name="wil_sell" type="text" required>
-                <br>
-                <label for="wil_data">2. William指標</label>
-                <input id="wil_data" name="wil_data" type="hidden" value="{{ wil_data }}">
-                <button class="btn btn-info" type="submit" value="record">william指標</button>
-            </form>
-        </div>
-        <br>
-        <div class="col text-center">
-            <form action="/MA_A" method="post">
-                <label for="ma_data">3A. 10日均線和20日均線上揚 黃金交叉時買進 死亡交叉時賣出</label>
-                <input id="ma_data" name="ma_data" type="hidden" value="{{ ma_data }}">
-                <button class="btn btn-danger" type="submit" value="record">MA_A</button>
-            </form>
-        </div>
-        <br>
-        <div class="col text-center">
-            <form action="/MA_B" method="post">
-                <label for="ma_data">3B. 5日均線和10日均線上揚 黃金交叉時買進 死亡交叉時賣出</label>
-                <input id="ma_data" name="ma_data" type="hidden" value="{{ ma_data }}">
-                <button class="btn btn-danger" type="submit" value="record">MA_B</button>
-            </form>
-        </div>
-        <br>
-        <div class="col text-center">
-            <form action="/MA_C" method="post">
-                <label for="ma_data">3C. 均線多頭排列時買進 5日線以外均線仍上揚但5日線跌破10日線時賣</label>
-                <input id="ma_data" name="ma_data" type="hidden" value="{{ ma_data }}">
-                <button class="btn btn-danger" type="submit" value="record">MA_C</button>
-            </form>
-        </div>
-        <br>
-        <div class="col text-center">
-            <form action="/MA_D" method="post">
-                <label for="ma_data">3D. 葛蘭必40日均線上揚且股價突破均線時買 均線下跌且股價跌破均線時賣</label>
-                <input id="ma_data" name="ma_data" type="hidden" value="{{ ma_data }}">
-                <button class="btn btn-danger" type="submit" value="record">MA_D</button>
-            </form>
-        </div>
-    </div>{% endif %}
-    <br>
-    {% if result %}
-    <div class="card w-100 p-3" style="width: 18rem;">
-        <div class="card-body">
-            <h4 class="card-title">我們所找到的策略回答: {{ result }}</h4>
-        </div>
-    </div>
-    {% endif %}
-    <div class="col text-end">
-        <form action="/discard" method="post">
-            <input name="refresh" type="hidden" value="true"> <button class="btn btn-secondary" type="submit"
-                value="Detect">捨棄/重新整理</button>
-        </form>
-    </div>
-
-</body>
-
-</html>
+</div>
+{% endblock %}
